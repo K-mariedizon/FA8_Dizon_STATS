@@ -1,0 +1,118 @@
+---
+title: "FA8"
+author: "Dizon, Kiana Marie"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r 1}
+# Load the PlantGrowth dataset
+data("PlantGrowth")
+
+# View the structure and summary of the data
+str(PlantGrowth)
+summary(PlantGrowth)
+
+```
+### The dataset has two variables:
+
+- weight: Numeric variable representing plant weight.
+- group: Factor variable with three levels: ctrl (control), trt1 (treatment 1), and trt2 (treatment 2).
+
+### Descriptive Statistics
+- Calculate descriptive statistics (mean and standard deviation) for each group.
+```{r 2}
+# Load necessary library for descriptive statistics
+library(dplyr)
+
+# Calculate descriptive statistics
+descriptive_stats <- PlantGrowth %>%
+  group_by(group) %>%
+  summarise(
+    Mean = mean(weight),
+    SD = sd(weight),
+    N = n()
+  )
+
+print(descriptive_stats)
+
+```
+### One-Way ANOVA
+- Conduct a one-way ANOVA to examine whether there is a significant difference in plant weights across the treatment groups.
+
+### Null Hypothesis (H0)
+- There is no significant difference in plant weight between the treatment groups.
+```{r 3}
+# Perform the one-way ANOVA
+anova_model <- aov(weight ~ group, data = PlantGrowth)
+
+# Output the ANOVA table
+summary(anova_model)
+
+```
+### Post-hoc Test (if ANOVA is significant)
+- If the ANOVA is significant, perform a Tukey's HSD post-hoc test to identify where the differences lie.
+```{r 4}
+# Tukey's HSD test for multiple comparisons
+tukey_test <- TukeyHSD(anova_model)
+
+# Output the results
+print(tukey_test)
+
+```
+### Checking Assumptions
+- Normality: Check the normality of residuals with the Shapiro-Wilk test and Q-Q plot.
+- Homogeneity of Variances: Use Levene’s test to check homogeneity of variances.
+
+
+```{r 5}
+# Check normality of residuals
+shapiro_test <- shapiro.test(residuals(anova_model))
+
+# Load car package for Levene's test
+library(car)
+
+# Perform Levene's test
+levene_test <- leveneTest(weight ~ group, data = PlantGrowth)
+
+# Output the results
+print(shapiro_test)
+print(levene_test)
+
+
+```
+
+### Report
+
+#### Abstract
+This study examined whether there were significant differences in plant weight among three treatment groups (control, treatment 1, and treatment 2) using data from the PlantGrowth dataset. A one-way ANOVA was conducted, revealing a statistically significant difference in plant weights between groups. Post-hoc comparisons indicated that the significant difference was specifically between treatment groups 1 and 2.
+
+#### Method
+#### Participants
+The PlantGrowth dataset contains 30 observations of plant weights, categorized into three treatment groups with 10 observations each: ctrl (control), trt1 (treatment 1), and trt2 (treatment 2).
+
+#### Descriptive Statistics
+Descriptive statistics indicated that the control group had a mean weight of 5.03 (SD = 0.583), treatment 1 had a mean weight of 4.66 (SD = 0.794), and treatment 2 had a mean weight of 5.53 (SD = 0.443).
+
+#### Statistical Analysis
+A one-way ANOVA was conducted to determine if there were significant differences in plant weight between the three groups. The assumptions of normality and homogeneity of variance were checked and met, as indicated by the Shapiro-Wilk test of residuals (W = 0.966, p = 0.438) and Levene’s test (F(2, 27) = 1.119, p = 0.341).
+
+#### Results
+The results of the one-way ANOVA indicated a significant effect of group on plant weight, F(2, 27) = 4.846, p = 0.016. Post-hoc analysis using Tukey’s HSD test revealed a statistically significant difference between treatment 1 and treatment 2 (Mdiff = 0.865, p = 0.012), but not between the control and treatment groups (trt1-ctrl: Mdiff = -0.371, p = 0.391; trt2-ctrl: Mdiff = 0.494, p = 0.198).
+
+#### Assumptions
+The assumption of normality was satisfied (Shapiro-Wilk W = 0.966, p = 0.438), and Levene's test confirmed homogeneity of variances among groups, F(2, 27) = 1.119, p = 0.341.
+
+#### Discussion
+The one-way ANOVA results indicate that there is a statistically significant difference in plant weight between the treatment groups. Specifically, the Tukey post-hoc test showed that the significant difference lies between treatment 1 and treatment 2, with treatment 2 having a higher mean weight. This suggests that the treatment applied in treatment group 2 may have a positive effect on plant growth relative to treatment 1.
+
+#### Conclusion
+In conclusion, this analysis provides evidence that treatment group 2 differs significantly from treatment 1 in terms of plant weight, indicating a potential impact of the treatment on growth. Further research might explore different dosage levels or environmental conditions to confirm these findings.
+
+
